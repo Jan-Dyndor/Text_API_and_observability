@@ -1,0 +1,16 @@
+[project]
+name = "simple-text-api"
+version = "0.1.0"
+description = "Simple text processing API"
+requires-python = ">=3.10"
+
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find] 
+where = ["src"]
