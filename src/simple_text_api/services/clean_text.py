@@ -5,6 +5,14 @@ import re
 def clean_input(
     input: str,
 ) -> str:
+    """
+    lean text function - remove specific signs from string and unnecessary spaces
+
+    :param input: user provided string
+    :type input: str
+    :return: clean string, ready for analysis
+    :rtype: str
+    """
     output = input.strip().lower()
 
     for char in CHARS_TO_DEL:
@@ -15,8 +23,3 @@ def clean_input(
     )  # Remove multiple spaces, \t ,\n  inside string
 
     return output
-
-
-z = "Hell@o.     worl!d"
-print(z)
-print(clean_input(z))
