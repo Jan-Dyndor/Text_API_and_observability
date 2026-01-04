@@ -3,4 +3,4 @@
 .vscode
 __pycache__
 simple_text_api.egg-info/
-data/*.db
+*.db
