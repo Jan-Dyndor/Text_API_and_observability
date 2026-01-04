@@ -62,5 +62,5 @@ def test_analyze_whole():
     assert data["words_count"] == 4
     assert data["frequent_words"]
     assert data["frequent_chars"]
-    assert data["orginal_text"] == input
+    assert data["original_text"] == input
     assert data["clean_text"] == "data science is great"
