@@ -13,7 +13,7 @@ def clean_input(
     :return: clean string, ready for analysis
     :rtype: str
     """
-    output = input.strip().lower()
+    output = input.lower()
 
     for char in CHARS_TO_DEL:
         output = output.replace(char, "")
@@ -22,4 +22,4 @@ def clean_input(
         r"\s+", " ", output
     )  # Remove multiple spaces, \t ,\n  inside string
 
-    return output
+    return output.strip()

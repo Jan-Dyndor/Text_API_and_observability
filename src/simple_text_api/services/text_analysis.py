@@ -15,7 +15,7 @@ def count_words(clean_text: str) -> int:
     return count
 
 
-def most_frequnet_words(clean_text: str) -> Dict[str, int]:
+def most_frequent_words(clean_text: str) -> Counter[str]:
     """
     Most frequent words counts
 
@@ -24,10 +24,11 @@ def most_frequnet_words(clean_text: str) -> Dict[str, int]:
     :return: dictionary containing the word : count values
     :rtype: Dict[string, int]
     """
+    clean_text = clean_text.replace(".", "")
     return Counter(clean_text.split())
 
 
-def most_frequent_char(clean_text: str) -> Dict[str, int]:
+def most_frequent_char(clean_text: str) -> Counter[str]:
     """
     Most frequent char in clean string
 
