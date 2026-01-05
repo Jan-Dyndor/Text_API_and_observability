@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
 
 from simple_text_api.main import app
+from simple_text_api.db.database import get_db
+from conftest import get_test_db
 
 client = TestClient(app)
 
@@ -54,9 +56,14 @@ def test_analyze_empty():
 
 
 def test_analyze_whole():
+
+    app.dependency_overrides[get_db] = get_test_db
+
     input: str = "Data Science! is grea@t"
     payload = {"input_string": input}
     response = client.post("/analyze", json=payload)
+
+    app.dependency_overrides.clear()
     data = response.json()
     assert response.status_code == 200
     assert data["words_count"] == 4

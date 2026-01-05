@@ -93,3 +93,5 @@ Returns service status.
   ]
 }
 ```
+
+The project uses unit tests for pure text-processing logic and integration tests for FastAPI endpoints with a test SQLite database using dependency overrides.

@@ -13,6 +13,7 @@ from simple_text_api.db.database import get_db
 from simple_text_api.db.models import TextAnalysisResult
 import json
 
+
 Base.metadata.create_all(bind=engine)  # Create table
 
 app = FastAPI()
