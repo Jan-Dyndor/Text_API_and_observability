@@ -1,8 +1,9 @@
 import pytest
 from sqlalchemy import create_engine
+from fastapi.testclient import TestClient
 from sqlalchemy.orm import sessionmaker, declarative_base
 from simple_text_api.config.conf import DATABASE_TEST_URL
-
+from simple_text_api.main import app, get_db
 from simple_text_api.db.models import (
     TextAnalysisResult,
 )  # noqa
@@ -33,21 +34,36 @@ def dirty_user_input_many_sentences() -> str:
     return "Hello!!!  This is first sentence.\n\nSecond one??  And third: sentence! @Really."
 
 
-engine_test = create_engine(
-    DATABASE_TEST_URL, connect_args={"check_same_thread": False}
-)
-
-SessionLocalTest = sessionmaker(autoflush=False, autocommit=False, bind=engine_test)
-
-Base.metadata.create_all(bind=engine_test)
-
-
-def get_test_db():
-    db_test = SessionLocalTest()
+@pytest.fixture(scope="function")
+def db_session():
+    """Create new database and yield session"""
+    engine_test = create_engine(
+        DATABASE_TEST_URL, connect_args={"check_same_thread": False}
+    )
+    SessionLocalTest = sessionmaker(autoflush=False, autocommit=False, bind=engine_test)
+    session = SessionLocalTest()
+    Base.metadata.create_all(bind=engine_test)
     try:
-        yield db_test
+        yield session
     finally:
-        db_test.close()
+        Base.metadata.drop_all(bind=engine_test)
+        engine_test.dispose()
+        session.close()
 
 
-# TODO !! 1. take care of conftest beeing importet many times 2. DO not use new database - use tempraty file since tests will populate this db adn can leave some junks 3. create fixture to get_tst_db and do not import to test_api ( thas antypattern) 4. dependency_pvverride hsoub be set in fixture with yeld and to clean up resources ehen finshed or when errror occured 5. Hace fixture on TestClient in fastapi 6. Create a test that will check if data in tetst_table / file are popualted after calling the endpoint
+@pytest.fixture(scope="function")
+def test_client(db_session):
+    """
+    Create test client and override FastAPI dependencies
+    """
+
+    def override_test_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = override_test_db
+
+    with TestClient(app) as client:
+        try:
+            yield client
+        finally:
+            app.dependency_overrides.clear()
