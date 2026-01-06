@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from simple_text_api.db.database import Base, engine
 from simple_text_api.schemas.schemas import AnalyzeResponse, CleanRequest, CleanResponse
@@ -12,11 +12,32 @@ from simple_text_api.services.text_analysis import (
 from simple_text_api.db.database import get_db
 from simple_text_api.db.models import TextAnalysisResult
 import json
+from simple_text_api.utils.logging import logger
+import time
+from uuid import uuid4
 
 
 Base.metadata.create_all(bind=engine)  # Create table
-
 app = FastAPI()
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    id = str(uuid4())
+    with logger.contextualize(request_id=id):
+        start_time = time.perf_counter()
+        try:
+            logger.debug(f"{request.method} {request.url.path}")
+            response = await call_next(request)
+            end_time = time.perf_counter() - start_time
+            logger.debug(
+                f"Completed with status {response.status_code} in {end_time} seconds"
+            )
+            return response
+        except Exception as e:
+            end_time = time.perf_counter() - start_time
+            logger.exception(f"Exception occured {e} and took {end_time}")
+            raise
 
 
 @app.get("/health")
