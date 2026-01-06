@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from simple_text_api.db.database import Base, engine
 from simple_text_api.schemas.schemas import AnalyzeResponse, CleanRequest, CleanResponse
@@ -46,9 +46,14 @@ def analyze_text(text: CleanRequest, db: Session = Depends(get_db)) -> AnalyzeRe
         frequent_words_json=json.dumps(frequent_words),
         frequent_chars_json=json.dumps(frequent_chars),
     )
-
-    db.add(db_obj)
-    db.commit()
+    try:
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+    except Exception as e:
+        db.rollback()
+        print(f"Issue occured while saving to DB {e}")
+        raise HTTPException(status_code=500, detail="Database error")
 
     return AnalyzeResponse(
         words_count=words_count,
