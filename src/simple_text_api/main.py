@@ -15,10 +15,12 @@ import json
 from simple_text_api.utils.logging import logger
 import time
 from uuid import uuid4
+from prometheus_fastapi_instrumentator import Instrumentator
 
 
 Base.metadata.create_all(bind=engine)  # Create table
 app = FastAPI()
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 
 @app.middleware("http")
