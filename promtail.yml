@@ -9,17 +9,60 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
-  - job_name: fastapi_text_
+  - job_name: simple_text_api_only
     docker_sd_configs:
       - host: unix:///var/run/docker.sock
         refresh_interval: 5s
 
     relabel_configs:
-      # only container logs
+      # 1) bierzemy TYLKO kontener simple_text_api
       - source_labels: ['__meta_docker_container_name']
         regex: '/simple_text_api'
         action: keep
 
-      # 2) Add label with continer name -> easier to filter in grafana
+      # 2) label container (zostaw, bo po tym filtrujesz w Grafanie)
+      - source_labels: ['__meta_docker_container_name']
+        target_label: container
+
+      # 3) dodaj stały label app (żeby mieć super-prosty filtr w dashboardzie)
+      - target_label: app
+        replacement: simple_text_api
+
+      # 4) (opcjonalnie) service, żeby drilldown nie robił unknown_service
+      - target_label: service
+        replacement: simple_text_api
+
+    pipeline_stages:
+      - json:
+          expressions:
+            record: record
+      - json:
+          source: record
+          expressions:
+            level: level.name
+            logger: name
+            msg: message
+            handler: extra.handler
+            method: extra.method
+      - labels:
+          level:
+          logger:
+          handler:
+          method:
+
+  - job_name: infra
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+
+    relabel_configs:
+    # No app logs
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/simple_text_api'
+        action: drop
+
+      - target_label: infra
+        replacement: "true"
+
       - source_labels: ['__meta_docker_container_name']
         target_label: container
