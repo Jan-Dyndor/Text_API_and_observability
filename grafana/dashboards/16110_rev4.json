@@ -137,7 +137,7 @@
           "datasource": "Prometheus",
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(http_requests_total{handler=\"/metrics\"})",
+          "expr": "sum(http_requests_total{handler!=\"/metrics\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -222,7 +222,7 @@
         }
       ],
       "timeFrom": "24h",
-      "title": "Requests Count",
+      "title": "Metrics Requests Count",
       "transformations": [
         {
           "id": "seriesToRows",
@@ -373,7 +373,6 @@
           "editorMode": "code",
           "exemplar": false,
           "expr": "sum(http_requests_total{job='fastapi', status=~'5xx'})",
-
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -561,7 +560,6 @@
           "datasource": "Prometheus",
           "exemplar": true,
           "expr": "sum by (handler) (rate(http_requests_total{job='fastapi', status='5xx', handler!=\"/metrics\"}[5m]))/sum by (handler) (rate(http_requests_total{job='fastapi', handler!='/metrics'}[5m]))",
-          
           "interval": "",
           "legendFormat": "{{path}}",
           "refId": "A"
@@ -661,187 +659,7 @@
       "title": "PR 99 Requests Duration",
       "type": "timeseries"
     },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 13
-      },
-      "id": 10,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.0.0",
-      "targets": [
-        {
-          "datasource": "Prometheus",
-          "exemplar": true,
-          "expr": "sum by (handler) (http_requests_in_progress{handler!=\"/metrics\"})",
-          "interval": "",
-          "legendFormat": "{{path}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Request In Process",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 13
-      },
-      "id": 12,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.0.0",
-      "targets": [
-        {
-          "datasource":"Prometheus",
-          "exemplar": true,
-          "expr": "rate(http_requests_total{handler!=\"/metrics\"}[1m])",
-          "interval": "",
-          "legendFormat": "{{handler}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Request Per Sec",
-      "type": "timeseries"
-    },
+
     {
       "datasource": "Loki",
       "fieldConfig": {
@@ -945,10 +763,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
-        "w": 6,
-        "x": 0,
-        "y": 21
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 13
       },
       "id": 14,
       "options": {
@@ -968,20 +786,113 @@
       "targets": [
         {
           "datasource": "Loki",
-          "expr": "100 * sum by (level) (count_over_time({app=\"simple_text_api\", handler!=\"/metrics\"}[1m])) / sum(count_over_time({app=\"simple_text_api\", handler!=\"/metrics\"}[1m]))",
+          "expr": "sum by (level) (count_over_time({app=\"simple_text_api\", handler!=\"/metrics\"}[1m]))",
           "legendFormat": "{{level}}",
           "refId": "A"
         }
       ],
-      "title": "Log Type Rate",
+      "title": "Log Type",
       "type": "timeseries"
     },
+
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 13
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "exemplar": true,
+          "expr": "rate(http_requests_total{handler!=\"/metrics\"}[1m])",
+          "interval": "",
+          "legendFormat": "{{handler}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Request Per Sec",
+      "type": "timeseries"
+    },
+
     {
       "datasource": "Loki",
       "gridPos": {
         "h": 9,
-        "w": 18,
-        "x": 6,
+        "w": 24,
+        "x": 0,
         "y": 21
       },
       "id": 2,
@@ -999,13 +910,13 @@
       "pluginVersion": "12.0.0",
       "targets": [
         {
-          "datasource":"Loki",
-          "expr": "{compose_service=\"app\"} |= \"$log_keyword\"",
+          "datasource": "Loki",
+          "expr": "{app=\"simple_text_api\", handler!=\"/metrics\"}",
           "hide": false,
           "refId": "A"
         }
       ],
-      "title": "Log of All FastAPI App",
+      "title": "Log of FastAPI App",
       "type": "logs"
     }
   ],

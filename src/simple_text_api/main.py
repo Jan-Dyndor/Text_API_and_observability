@@ -2,7 +2,6 @@ import json
 import time
 from uuid import uuid4
 
-import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Request
 from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.orm import Session
@@ -26,33 +25,31 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    # if request.url.path == "/metrics":
-    #     return await call_next(request)
-
     id = str(uuid4())
-    req_logger = logger.bind(handler=request.url.path, method=request.method)
-    with logger.contextualize(request_id=id):
+    with logger.contextualize(
+        request_id=id, handler=request.url.path, method=request.method
+    ):
         start_time = time.perf_counter()
         try:
             response = await call_next(request)
             end_time = time.perf_counter() - start_time
             status = response.status_code
             if status >= 500:
-                req_logger.error(
+                logger.error(
                     f"Error {response.status_code} {request.method} {request.url.path} in {end_time} seconds"
                 )
             elif status >= 400 and status < 500:
-                req_logger.warning(
+                logger.warning(
                     f"WARNING {response.status_code} {request.method} {request.url.path} in {end_time} seconds"
                 )
             else:
-                req_logger.info(
+                logger.info(
                     f"Completed {request.method} {request.url.path} with status {response.status_code} in {end_time} seconds"
                 )
             return response
         except Exception as e:
             end_time = time.perf_counter() - start_time
-            req_logger.exception(
+            logger.exception(
                 f"Exception occured  {request.method} {request.url.path} -- {e} and took {end_time}"
             )
             raise
